@@ -6,6 +6,7 @@
 extern TIM_HandleTypeDef htim1;
 
 void NMI_Handler(void) {
+    __NOP();
 }
 
 void HardFault_Handler(void) {
@@ -29,6 +30,7 @@ void UsageFault_Handler(void) {
 }
 
 void DebugMon_Handler(void) {
+    __NOP();
 }
 
 void TIM1_UP_IRQHandler(void) {

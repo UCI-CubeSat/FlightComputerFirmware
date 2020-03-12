@@ -19,8 +19,8 @@ int main(void) {
     SystemClock_Config();
 
     MX_GPIO_Init();
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
     logger_init(Error_Handler);
-    logger_send_imu(30, 40, 50);
 
     osKernelInitialize();
 
@@ -55,12 +55,12 @@ static void MX_GPIO_Init(void) {
 void StartDefaultTask(void *argument) {
     for (;;) {
         logger_send_imu(30, 40, 50);
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
         osDelay(500);
     }
 }
 
 
 void Error_Handler(void) {
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 }
 

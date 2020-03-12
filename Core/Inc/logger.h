@@ -2,6 +2,7 @@
 #define CUBESATUART_LOGGER_H
 
 #include "stm32f1xx_hal.h"
+#include "system_interrupts.h"
 
 #define IMU_OPCODE 0x1
 
