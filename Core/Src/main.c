@@ -1,3 +1,4 @@
+#include "logger.h"
 #include "main.h"
 #include "cmsis_os.h"
 
@@ -18,6 +19,8 @@ int main(void) {
     SystemClock_Config();
 
     MX_GPIO_Init();
+    logger_init(Error_Handler);
+    logger_send_imu(30, 40, 50);
 
     osKernelInitialize();
 
@@ -51,6 +54,7 @@ static void MX_GPIO_Init(void) {
 
 void StartDefaultTask(void *argument) {
     for (;;) {
+        logger_send_imu(30, 40, 50);
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
         osDelay(500);
     }
