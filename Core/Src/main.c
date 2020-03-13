@@ -22,8 +22,8 @@ void init_modules() {
 void main_thread(void* args) {
     while (1) {
         for (int i = 0; i < 255; i++) {
-            logger_send_imu(i, i, i);
-            osDelay(1);
+            logger_send_imu(255, i, i);
+            osDelay(100);
         }
     }
 }

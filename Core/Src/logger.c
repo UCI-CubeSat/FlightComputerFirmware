@@ -63,6 +63,8 @@ void thread(void* arguments) {
     uint8_t *priority = NULL;
 
     while (1) {
+        if (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY) continue;
+
         osMessageQueueGet(queue, &message, priority, osWaitForever);
         send_packet(message.packet, message.size);
     }
@@ -80,7 +82,7 @@ void queue_message(uint8_t *buf, uint8_t size) {
     Logger_Queue_Msg message;
     message.size = size;
     memcpy(message.packet, buf, size);
-    osMessageQueuePut(queue, &message, osPriorityNormal, osWaitForever);
+    osMessageQueuePut(queue, &message, osPriorityNormal, 0);
 }
 
 void logger_send_imu(uint16_t roll, uint16_t pitch, uint16_t yaw) {
