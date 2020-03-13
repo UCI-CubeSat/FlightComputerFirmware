@@ -1,9 +1,15 @@
-#include <cmsis_os2.h>
 #include "logger.h"
+#include "string.h"
 
 UART_HandleTypeDef huart1;
+osMessageQueueId_t queue;
 
 uint8_t buf[] = {1, 2, 3};
+
+const osThreadAttr_t task_attributes = {
+        .name = "logger_task",
+        .priority = osPriorityNormal,
+        .stack_size = 128 * 4};
 
 void USART1_IRQHandler(void) {
     HAL_UART_IRQHandler(&huart1);
@@ -50,14 +56,29 @@ void uart_init(void (*error_handler)(void)) {
     }
 }
 
+void send_packet(uint8_t *packet, uint8_t size) {
+    HAL_UART_Transmit_IT(&huart1, packet, size);
+}
+
+void thread(void* arguments) {
+    uint8_t msg[LOGGER_MSG_SIZE];
+    uint8_t *priority = NULL;
+
+    while (1) {
+        osStatus_t status = osMessageQueueGet(queue, &msg, priority, osWaitForever);
+        send_packet(msg, 7);
+        osDelay(500);
+    }
+}
+
 void logger_init(void (*error_handler)(void)) {
     gpio_init();
     uart_init(error_handler);
+
+    queue = osMessageQueueNew(LOGGER_QUEUE_COUNT, LOGGER_MSG_SIZE, NULL);
+    osThreadNew(thread, NULL, &task_attributes);
 }
 
-void send_packet(void *packet, uint16_t size) {
-    HAL_UART_Transmit_IT(&huart1, buf, 3);
-}
 
 void logger_send_imu(uint16_t roll, uint16_t pitch, uint16_t yaw) {
     IMU_Packet packet = {
@@ -67,6 +88,14 @@ void logger_send_imu(uint16_t roll, uint16_t pitch, uint16_t yaw) {
             .yaw = yaw
     };
 
-    send_packet(&packet, sizeof(IMU_Packet));
+    Generic_Packet generic_packet = {
+            .to_send = (uint8_t*) &packet,
+            .size = sizeof(IMU_Packet)};
+
+    uint8_t data_to_send[LOGGER_MSG_SIZE];
+    memcpy(data_to_send, &packet, sizeof(packet));
+
+    osStatus_t status = osMessageQueuePut(queue, &data_to_send, osPriorityNormal, osWaitForever);
+    __NOP();
 }
 
