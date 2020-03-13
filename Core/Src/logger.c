@@ -78,7 +78,7 @@ void logger_init(void (*error_handler)(void)) {
     osThreadNew(thread, NULL, &task_attributes);
 }
 
-void queue_message(uint8_t *buf, uint8_t size) {
+void queue_message(const uint8_t *buf, uint8_t size) {
     Logger_Queue_Msg message;
     message.size = size;
     memcpy(message.packet, buf, size);
