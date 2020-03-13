@@ -4,8 +4,6 @@
 UART_HandleTypeDef huart1;
 osMessageQueueId_t queue;
 
-uint8_t buf[] = {1, 2, 3};
-
 const osThreadAttr_t task_attributes = {
         .name = "logger_task",
         .priority = osPriorityNormal,
@@ -61,13 +59,12 @@ void send_packet(uint8_t *packet, uint8_t size) {
 }
 
 void thread(void* arguments) {
-    uint8_t msg[LOGGER_MSG_SIZE];
+    Logger_Queue_Msg message;
     uint8_t *priority = NULL;
 
     while (1) {
-        osStatus_t status = osMessageQueueGet(queue, &msg, priority, osWaitForever);
-        send_packet(msg, 7);
-        osDelay(500);
+        osMessageQueueGet(queue, &message, priority, osWaitForever);
+        send_packet(message.packet, message.size);
     }
 }
 
@@ -75,27 +72,20 @@ void logger_init(void (*error_handler)(void)) {
     gpio_init();
     uart_init(error_handler);
 
-    queue = osMessageQueueNew(LOGGER_QUEUE_COUNT, LOGGER_MSG_SIZE, NULL);
+    queue = osMessageQueueNew(LOGGER_QUEUE_COUNT, sizeof(Logger_Queue_Msg), NULL);
     osThreadNew(thread, NULL, &task_attributes);
 }
 
+void queue_message(uint8_t *buf, uint8_t size) {
+    Logger_Queue_Msg message;
+    message.size = size;
+    memcpy(message.packet, buf, size);
+    osMessageQueuePut(queue, &message, osPriorityNormal, osWaitForever);
+}
 
 void logger_send_imu(uint16_t roll, uint16_t pitch, uint16_t yaw) {
-    IMU_Packet packet = {
-            .opcode = IMU_OPCODE,
-            .roll = roll,
-            .pitch = pitch,
-            .yaw = yaw
-    };
-
-    Generic_Packet generic_packet = {
-            .to_send = (uint8_t*) &packet,
-            .size = sizeof(IMU_Packet)};
-
-    uint8_t data_to_send[LOGGER_MSG_SIZE];
-    memcpy(data_to_send, &packet, sizeof(packet));
-
-    osStatus_t status = osMessageQueuePut(queue, &data_to_send, osPriorityNormal, osWaitForever);
-    __NOP();
+    IMU_Packet packet = {.opcode = IMU_OPCODE, .roll = roll,
+            .pitch = pitch, .yaw = yaw};
+    queue_message((uint8_t *) &packet, sizeof(packet));
 }
 

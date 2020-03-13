@@ -23,7 +23,7 @@ void main_thread(void* args) {
     while (1) {
         for (int i = 0; i < 255; i++) {
             logger_send_imu(i, i, i);
-            osDelay(500);
+            osDelay(1);
         }
     }
 }

@@ -8,12 +8,12 @@
 #define IMU_OPCODE 0x1
 
 #define LOGGER_QUEUE_COUNT 8
-#define LOGGER_MSG_SIZE 8
+#define LOGGER_MAX_MSG_SIZE 8
 
 typedef struct {
-    uint8_t *to_send;
     uint8_t size;
-} Generic_Packet;
+    uint8_t packet[LOGGER_MAX_MSG_SIZE];
+} Logger_Queue_Msg;
 
 #pragma pack(1)
 typedef struct {
