@@ -1,27 +1,27 @@
-#Overview
+# Overview
 
 This is the main firmware that will run onboard the STM32 flight computer. It's using FreeRTOS with the CMSIS-RTOS v2 wrapper. 
 
-#Modules
+# Modules
+## Logging
 
-##Logging
 Logging is done through a USB-Serial converter connected to USART1 (pins PA9 and PA10). The configuration is 115200 baud 8N1. See the COSMOS config repo for how to interpret the packets.
 
-###Usage
+### Usage
 Call `logger_init(error_handler)` to initialize the module. Use `logger_send_imu(roll, pitch, yaw)` to log data. 
 
-###Internals
+### Internals
 This module creates a task, along with a queue for communication to that task. When `logger_send_imu` is called, the method pushes a new message onto the queue, from the caller thread. The push operation uses try semantics, meaning that if the queue is full, the operation will fail immediately.
 
 The logger task takes messages off the queue, and transmits them. In the future, this task will also be used for receiving incoming messages. 
 
-#Building and running
+# Building and running
 
 The code can be built and flashed using STM32CubeIDE. 
 
 In addition, I'm using CLion as my development environment, which automatically generated a CMake file. This can be used to compile the firmware. To flash it, use your preferred tool. In my case, CLion includes support for openocd. The ST-LINK utility also works. 
 
-#Useful Resources
+# Useful Resources
 - [CMSIS-RTOS v2][RTOS]
 - [HAL Reference][HAL]
 - [STM32F103xx Reference Manual][REF]
