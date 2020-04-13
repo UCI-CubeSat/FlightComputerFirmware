@@ -35,11 +35,14 @@ The code can be built and flashed using STM32CubeIDE.
 In addition, I'm using CLion as my development environment, which automatically generated a CMake file. This can be used to compile the firmware. To flash it, use your preferred tool. In my case, CLion includes support for openocd. The ST-LINK utility also works. 
 
 # Useful Resources
+- [BNO055 Datasheet][BNO055Data]
 - [CMSIS-RTOS v2][RTOS]
+- [Cortex M3 Programming Manual][CTX]
 - [HAL Reference][HAL]
 - [STM32F103xx Reference Manual][REF]
-- [Cortex M3 Programming Manual][CTX]
 
+[BNO055Data]:
+https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bno055-ds000.pdf
 
 [CTX]: https://www.st.com/content/ccc/resource/technical/document/programming_manual/5b/ca/8d/83/56/7f/40/08/CD00228163.pdf/files/CD00228163.pdf/jcr:content/translations/en.CD00228163.pdf
 
