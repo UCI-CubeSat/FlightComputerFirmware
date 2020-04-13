@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "IMU.h"
 
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
@@ -17,14 +18,16 @@ void system_init() {
 
 void init_modules() {
     logger_init(Error_Handler);
+    imu_init(Error_Handler);
 }
 
 void main_thread(void* args) {
+    IMU_Angles angles;
+
     while (1) {
-        for (int i = 0; i < 255; i++) {
-            logger_send_imu(255, i, i);
-            osDelay(100);
-        }
+        imu_read_euler(&angles);
+        logger_send_imu(angles.h, angles.p, angles.r);
+        HAL_Delay(50);
     }
 }
 
@@ -33,14 +36,15 @@ int main(void) {
     init_modules();
 
     osThreadNew(main_thread, NULL, &defaultTask_attributes);
-
     osKernelStart();
-
     while (1) {}
 }
 
 
 
 void Error_Handler(void) {
+    while (1) {
+
+    }
 }
 
